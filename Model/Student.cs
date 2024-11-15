@@ -1,10 +1,13 @@
-﻿using System;
+﻿using Microsoft.AspNetCore.Identity;
+using System;
 using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
 
 namespace Api_1.Model;
 
-public partial class Student
+public partial class Student 
 {
+    
     public int Id { get; set; }
 
     public string? FullName { get; set; }

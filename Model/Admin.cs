@@ -1,9 +1,10 @@
-﻿using System;
+﻿using Microsoft.AspNetCore.Identity;
+using System;
 using System.Collections.Generic;
 
 namespace Api_1.Model;
 
-public partial class Admin
+public partial class Admin 
 {
     public int Id { get; set; }
 

@@ -1,38 +1,49 @@
-﻿ using System.Web.Mvc;
+﻿using Microsoft.EntityFrameworkCore;
+using System.Web.Mvc;
 
 namespace Api_1.Repository;
 
-public class StudentRepository
+public class StudentRepository(EducationalPlatformContext _db)
 {
-    private static EducationalPlatformContext db = new EducationalPlatformContext();
+    private readonly EducationalPlatformContext db = _db;
 
     
-    public IEnumerable<Student> all() => db.Students.ToList();
+    public async Task<IEnumerable<Student>> all() => await db.Students.Where(i => i.IsDelete == "foles").ToListAsync();
 
-    public Student GetById(int id) => db.Students.SingleOrDefault(i => i.Id == id);
-    public Student add (Student student)
+    public async Task <Student> GetById(int id) => await db.Students.SingleOrDefaultAsync(i => i.Id == id);
+    
+    public async Task <Student> add (Student student , CancellationToken cancellationToken = default)
     {
-        db.Students.Add(student);
-        db.SaveChanges();
+        await db.Students.AddAsync(student , cancellationToken);
+        await db.SaveChangesAsync(cancellationToken);
         return student;
-    }
-    public bool update(int id , Student student)
+    }   
+   
+    public async Task <bool> update(int id , Student student, CancellationToken cancellationToken = default)
     {
-        var isfind = GetById(id);
+        var isfind = await GetById(id);
         if (isfind is null)
             return false;
         isfind.FullName = student.FullName;
-        db.SaveChanges();
-        return true;
+        await db.SaveChangesAsync(cancellationToken);
+        return  true;
     }
-    public bool Delete(int id)
+    public async Task <bool> Delete(int id , CancellationToken cancellationToken = default)
     {
-        var isfind = GetById(id);
+        var isfind = await GetById(id);
         if (isfind is null)
             return false;
-        db.Students.Remove(isfind);
-        db.SaveChanges();
+        //db.Students.Remove(isfind);
+        isfind.IsDelete = "true";
+        await db.SaveChangesAsync(cancellationToken);
         return true;
+    }
+
+    public async Task<Student> Login (string Email, string password)
+    {
+        var user = await db.Students.SingleOrDefaultAsync
+            (i=> i.Email == Email && i.Password == password );
+        return user;
     }
 
 }

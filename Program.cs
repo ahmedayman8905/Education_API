@@ -1,6 +1,13 @@
 
-using Api_1.Model;
+using Api_1.Entity;
+using Api_1.Outherize;
 using Api_1.Repository;
+using Mapster;
+using MapsterMapper;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.IdentityModel.Tokens;
+using System.Reflection;
+using System.Text;
 
 namespace Api_1;
 
@@ -17,7 +24,42 @@ public class Program
         builder.Services.AddEndpointsApiExplorer();
         builder.Services.AddSwaggerGen();
         builder.Services.AddScoped<EducationalPlatformContext>();
+        builder.Services.AddScoped<AuthService>();
+        builder.Services.AddScoped<token>();
+
+
         builder.Services.AddScoped<StudentRepository>();
+        // Add Mapster
+        var mappingConfig = TypeAdapterConfig.GlobalSettings;
+        mappingConfig.Scan(Assembly.GetExecutingAssembly());
+
+        builder.Services.AddSingleton<IMapper>(new Mapper(mappingConfig));
+
+        //builder.Services.AddIdentityApiEndpoints<userLogin>()
+        //  .AddEntityFrameworkStores<EducationalPlatformContext>();
+
+
+
+        builder.Services.AddAuthentication(options =>
+        {
+            options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
+            options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
+        })
+        .AddJwtBearer(o =>
+        {
+            o.SaveToken = true;
+            o.TokenValidationParameters = new TokenValidationParameters
+            {
+                ValidateIssuerSigningKey = true,
+                ValidateIssuer = true,
+                ValidateAudience = true,
+                ValidateLifetime = true,
+                IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes("J7MfAb4WcAIMkkigVtIepIILOVJEjacB")),
+                ValidIssuer = "SurveyBasketApp",
+                ValidAudience = "SurveyBasketApp users"
+            };
+        });
+
 
 
 
@@ -42,6 +84,7 @@ public class Program
 
         app.UseAuthorization();
 
+        //app.MapIdentityApi<userLogin>();
 
         app.MapControllers();
 
