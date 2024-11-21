@@ -13,5 +13,7 @@ public class StudentResponse
     public string? Gender { get; set; }
     public string Token {  get; set; }
     public int ExpiresIn { get; set; }
+    public string RefreshToken { get; set; }
+    public DateTime RefreshTokenExpiretion { get; set; }
 
 }

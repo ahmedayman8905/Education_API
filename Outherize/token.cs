@@ -1,4 +1,5 @@
 ﻿using Api_1.Contract;
+using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.Tokens;
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
@@ -6,8 +7,10 @@ using System.Text;
 
 namespace Api_1.Outherize;
 
-public class token
+public class token(IOptions<JwtOptions> options)
 {
+    private readonly JwtOptions _options = options.Value;
+
     public (string token, int expiresIn) GenerateToken(StudentResponse user)
     {
         // Define claims for the token
@@ -22,46 +25,73 @@ public class token
             new Claim(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString())
         };
 
+        //// Create the key for signing the token
+        //var symmetricSecurityKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes("J7MfAb4WcAIMkkigVtIepIILOVJEjacB"));
+
+        //// Define signing credentials with security algorithm
+        //var signingCredentials = new SigningCredentials(symmetricSecurityKey, SecurityAlgorithms.HmacSha256);
+
+
+        ////
+        //var expiresIn = 30;
+
+        //var token = new JwtSecurityToken(
+        //    issuer: "SurveyBasketApp",
+        //    audience: "SurveyBasketApp users",
+        //    claims: claims,
+        //    expires: DateTime.UtcNow.AddMinutes(expiresIn),
+        //    signingCredentials: signingCredentials
+        //);
+
+        // use option pattern
+
         // Create the key for signing the token
-        var symmetricSecurityKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes("J7MfAb4WcAIMkkigVtIepIILOVJEjacB"));
+        var symmetricSecurityKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_options.Key));
 
         // Define signing credentials with security algorithm
         var signingCredentials = new SigningCredentials(symmetricSecurityKey, SecurityAlgorithms.HmacSha256);
 
 
-        //
-        var expiresIn = 30;
-
         var token = new JwtSecurityToken(
-            issuer: "SurveyBasketApp",
-            audience: "SurveyBasketApp users",
+            issuer: _options.Issuer,
+            audience: _options.Audience,
             claims: claims,
-            expires: DateTime.UtcNow.AddMinutes(expiresIn),
+            expires: DateTime.UtcNow.AddMinutes(_options.ExpiryMinutes),
             signingCredentials: signingCredentials
         );
 
-        return (token: new JwtSecurityTokenHandler().WriteToken(token), expiresIn: expiresIn);
 
 
+        //return (token: new JwtSecurityTokenHandler().WriteToken(token), expiresIn: expiresIn * 60);
 
+        return (token: new JwtSecurityTokenHandler().WriteToken(token), expiresIn: _options.ExpiryMinutes * 60);
 
-        //// Calculate token expiration time
-        //var expirationDate = DateTime.UtcNow.AddMinutes(expiresIn);
+    }
 
-        //// Create the token descriptor
-        //var tokenDescriptor = new SecurityTokenDescriptor
-        //{
-        //    Subject = new ClaimsIdentity(claims),
-        //    Expires = expirationDate,
-        //    SigningCredentials = signingCredentials
-        //};
+    public string? ValisationToken(string token)
+    {
+        var tokenHandler = new JwtSecurityTokenHandler();
+        var symmetricSecurityKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_options.Key));
 
-        //// Generate the token
-        //var tokenHandler = new JwtSecurityTokenHandler();
-        //var securityToken = tokenHandler.CreateToken(tokenDescriptor);
-        //var token = tokenHandler.WriteToken(securityToken);
+        try
+        {
+            tokenHandler.ValidateToken(token, validationParameters: new TokenValidationParameters
+            {
+                IssuerSigningKey = symmetricSecurityKey,
+                ValidateIssuerSigningKey = true,
+                ValidateIssuer = false,
+                ValidateAudience = false,
+                ClockSkew = TimeSpan.Zero
+            }, out SecurityToken validatedToken);
 
-        //return (token, expiresIn);
+            var jwtToken = (JwtSecurityToken)validatedToken;
+
+            return jwtToken.Claims.First(x => x.Type == JwtRegisteredClaimNames.Sub).Value;
+        }
+        catch
+        {
+            return null;
+        }
     }
 
 }

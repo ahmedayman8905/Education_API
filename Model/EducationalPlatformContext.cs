@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
 
 namespace Api_1.Model;
@@ -25,6 +24,8 @@ public partial class EducationalPlatformContext : DbContext
     public virtual DbSet<Instructor> Instructors { get; set; }
 
     public virtual DbSet<Material> Materials { get; set; }
+
+    public virtual DbSet<RefreshToken> RefreshTokens { get; set; }
 
     public virtual DbSet<Regestration> Regestrations { get; set; }
 
@@ -130,6 +131,26 @@ public partial class EducationalPlatformContext : DbContext
                 .HasForeignKey(d => d.CoursId)
                 .OnDelete(DeleteBehavior.Cascade)
                 .HasConstraintName("FK__Material__cours___1CF15040");
+        });
+
+        modelBuilder.Entity<RefreshToken>(entity =>
+        {
+            entity.HasKey(e => new { e.Id, e.UserId });
+
+            entity.ToTable("RefreshToken");
+
+            entity.Property(e => e.Id).HasColumnName("id");
+            entity.Property(e => e.UserId).HasColumnName("user_id");
+            entity.Property(e => e.CreatedOn)
+                .HasDefaultValueSql("(getdate())")
+                .HasColumnType("datetime");
+            entity.Property(e => e.ExpiresOn).HasColumnType("datetime");
+            entity.Property(e => e.RevokedOn).HasColumnType("datetime");
+
+            entity.HasOne(d => d.User).WithMany(p => p.RefreshTokens)
+                .HasForeignKey(d => d.UserId)
+                .OnDelete(DeleteBehavior.ClientSetNull)
+                .HasConstraintName("FK_RefreshToken_Students");
         });
 
         modelBuilder.Entity<Regestration>(entity =>

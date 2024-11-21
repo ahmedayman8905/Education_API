@@ -1,13 +1,10 @@
-﻿using Microsoft.AspNetCore.Identity;
-using System;
+﻿using System;
 using System.Collections.Generic;
-using System.ComponentModel.DataAnnotations;
 
 namespace Api_1.Model;
 
-public partial class Student 
+public partial class Student
 {
-    
     public int Id { get; set; }
 
     public string? FullName { get; set; }
@@ -25,6 +22,8 @@ public partial class Student
     public DateOnly? BirthDay { get; set; }
 
     public string? IsDelete { get; set; }
+
+    public virtual ICollection<RefreshToken> RefreshTokens { get; set; } = new List<RefreshToken>();
 
     public virtual ICollection<Regestration> Regestrations { get; set; } = new List<Regestration>();
 }

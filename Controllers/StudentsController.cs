@@ -121,12 +121,23 @@ public class StudentsController : ControllerBase
     //}
 
     [HttpPost("/Login")]
-    public async Task<IActionResult> Login(userLogin user)
+    public  IActionResult Login(userLogin user)
     {
         // var isvalid = await student.Login(user.Email, user.Passsword);
         var isvalid =  authService.Login(user.Email, user.Passsword);
         if (isvalid is null)
             return BadRequest("Invalid email/password");
+        return Ok(isvalid);
+
+    }
+
+    [HttpPost("/RefreshToken")]
+    public IActionResult GetRefrehToken(RefreshtokenReqest request)
+    {
+        // var isvalid = await student.Login(user.Email, user.Passsword);
+        var isvalid =  authService.GetRefreshTokenAsync(request.token , request.RefeshToken);
+        if (isvalid is null)
+            return BadRequest("Invalid");
         return Ok(isvalid);
 
     }

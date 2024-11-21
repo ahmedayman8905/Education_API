@@ -40,28 +40,30 @@ public class Program
 
 
 
-        builder.Services.AddAuthentication(options =>
-        {
-            options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
-            options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
-        })
-        .AddJwtBearer(o =>
-        {
-            o.SaveToken = true;
-            o.TokenValidationParameters = new TokenValidationParameters
-            {
-                ValidateIssuerSigningKey = true,
-                ValidateIssuer = true,
-                ValidateAudience = true,
-                ValidateLifetime = true,
-                IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes("J7MfAb4WcAIMkkigVtIepIILOVJEjacB")),
-                ValidIssuer = "SurveyBasketApp",
-                ValidAudience = "SurveyBasketApp users"
-            };
-        });
+        //builder.Services.AddAuthentication(options =>
+        //{
+        //    options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
+        //    options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
+        //})
+        //.AddJwtBearer(o =>
+        //{
+
+        //    o.SaveToken = true;
+        //    o.TokenValidationParameters = new TokenValidationParameters
+        //    {
+        //        ValidateIssuerSigningKey = true,
+        //        ValidateIssuer = true,
+        //        ValidateAudience = true,
+        //        ValidateLifetime = true,
+        //        IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes("J7MfAb4WcAIMkkigVtIepIILOVJEjacB")),
+        //        ValidIssuer = "SurveyBasketApp",
+        //        ValidAudience = "SurveyBasketApp users"
+
+        //    };
+        //});
 
 
-
+        builder.Services.AddDependencies(builder.Configuration);
 
         var app = builder.Build();
 
