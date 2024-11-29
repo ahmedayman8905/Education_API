@@ -20,7 +20,7 @@ public static class Depandence
         // use CORS policy
         services.AddCors(options =>
         {
-            options.AddPolicy(name: "AllowAll", builder =>
+            options.AddDefaultPolicy( builder =>
             {
                 builder
                     .AllowAnyOrigin()

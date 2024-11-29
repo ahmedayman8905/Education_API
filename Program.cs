@@ -84,7 +84,7 @@ public class Program
 
         app.UseHttpsRedirection();
 
-        app.UseCors("AllowAll");
+        app.UseCors();
 
         app.UseAuthorization();
 
