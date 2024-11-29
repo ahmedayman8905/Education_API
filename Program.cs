@@ -84,6 +84,8 @@ public class Program
 
         app.UseHttpsRedirection();
 
+        app.UseCors("AllowAll");
+
         app.UseAuthorization();
 
         //app.MapIdentityApi<userLogin>();

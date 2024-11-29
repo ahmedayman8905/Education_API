@@ -5,6 +5,7 @@ using Api_1.Outherize;
 using Api_1.Repository;
 using Mapster;
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Cors;
 
 namespace Api_1.Controllers;
 [Route("api/[controller]")]
@@ -23,6 +24,8 @@ public class StudentsController : ControllerBase
 
     // [HttpGet("/GetAllStudents")]
     [HttpGet]
+    //[DisableCors]
+    //[EnableCors("AllowAll2")]
     [Authorize]
     public async Task <IActionResult> Get()
     {
